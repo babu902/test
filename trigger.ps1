@@ -1,32 +1,23 @@
-# Set variables for your Azure DevOps organization, project, and pipeline
-$org = "your-organization-name"
-$project = "your-project-name"
-$pipelineId = "your-pipeline-id"
+jobs:
+- job: my_job
+  steps:
+  - script: echo "This job runs before MyOtherPipeline."
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        $token = "$(System.AccessToken)"
+        $url = "$(System.TeamFoundationCollectionUri)/$(System.TeamProject)/_apis/pipelines/$(my_other_pipeline)/runs?api-version=6.0-preview.1"
 
-# Set the URL for the Azure DevOps REST API endpoint for triggering a pipeline
-$url = "https://dev.azure.com/$org/$project/_apis/pipelines/$pipelineId/runs?api-version=6.0-preview.1"
+        do {
+          Start-Sleep -s 10
+          $response = Invoke-RestMethod -Uri $url -Method Get -Headers @{Authorization = "Bearer $token"}
+          $status = $response.value[0].status
+        } while ($status -in @('inProgress', 'notStarted'))
 
-# Set the body of the POST request to specify any required parameters or variables for the pipeline
-$body = @{
-    resources = @{
-        repositories = @{
-            self = @{
-                refName = "refs/heads/master"
-            }
+        if ($status -eq 'succeeded') {
+          echo "MyOtherPipeline succeeded."
+        } else {
+          echo "MyOtherPipeline failed."
         }
-    }
-    templateParameters = @{
-        parameterName = "parameterValue"
-    }
-}
-
-# Convert the body to JSON format
-$jsonBody = $body | ConvertTo-Json
-
-# Set the authorization header using the system access token
-$headers = @{
-    Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN"
-}
-
-# Send the HTTP POST request to trigger the pipeline
-$response = Invoke-RestMethod -Uri $url -Method Post -Headers $headers -Body $jsonBody
+  - script: echo "This job runs after MyOtherPipeline completes."
