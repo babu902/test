@@ -1,3 +1,10 @@
 RUN curl -L https://download.java.net/openjdk/jdk17/ri/openjdk-17+35_linux-x64_bin.tar.gz --output /tmp/openjdk-17+35_linux-x64_bin.tar.gz && \
     tar -xzf /tmp/openjdk-17+35_linux-x64_bin.tar.gz -C /opt/ && \
     rm /tmp/openjdk-17+35_linux-x64_bin.tar.gz
+
+
+
+<script type="text/javascript"> if (window.performance && window.performance.mark) { window.performance.mark('requireStart'); }
+require(["Authentication/Scripts/SPS.Authentication.Controls","Authentication/Scripts/SPS.Authentication"], function(){  if (window.performance && window.performance.mark) { window.performance.mark('requireEnd'); } window.requiredModulesLoaded=true;  });
+</script>
+
