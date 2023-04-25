@@ -1,10 +1,48 @@
-RUN curl -L https://download.java.net/openjdk/jdk17/ri/openjdk-17+35_linux-x64_bin.tar.gz --output /tmp/openjdk-17+35_linux-x64_bin.tar.gz && \
-    tar -xzf /tmp/openjdk-17+35_linux-x64_bin.tar.gz -C /opt/ && \
-    rm /tmp/openjdk-17+35_linux-x64_bin.tar.gz
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+     - applications/cct-gateway/expanded/sit/overlays/sit/module-versions.yaml
 
+pool:
+  name: 'Default'
+  
+steps:
 
+- powershell: |
+    $uri = "$($env:SYSTEM_TEAMFOUNDATIONSERVERURI)$env:SYSTEM_TEAMPROJECTID/_apis/build/builds/$($env:BUILD_BUILDID)/changes?api-version=6.0"
+    $response = Invoke-RestMethod -Uri $uri -Headers @{Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN"} -Method Get
+    $changedFiles = $response.value.filename | Where-Object { $_ -like 'applications/cct-gateway/expanded/sit/overlays/sit/' -or $_ -like 'applications/cct-gateway/expanded/dev/overlays/dev/*' }
+    
+    # Print the changed paths that match the paths.include section
+    $includePaths = ('applications/cct-gateway/expanded/sit/overlays/sit/*','applications/cct-gateway/expanded/dev/overlays/dev/*')
+    $changedIncludePaths = $changedFiles | Where-Object { $_ -in $includePaths }
+    if ($changedIncludePaths) {
+      Write-Host "Changed paths in include section:"
+      foreach ($path in $changedIncludePaths) {
+        Write-Host $path
+      }
+    } else {
+      Write-Host "No changed paths in include section."
+    }
+- powershell: |
+    $orgName = "CTS-Edison"
+    $projectName = "CorporateTrust"
+    $personalAccessToken = "$(System.AccessToken)"
 
-<script type="text/javascript"> if (window.performance && window.performance.mark) { window.performance.mark('requireStart'); }
-require(["Authentication/Scripts/SPS.Authentication.Controls","Authentication/Scripts/SPS.Authentication"], function(){  if (window.performance && window.performance.mark) { window.performance.mark('requireEnd'); } window.requiredModulesLoaded=true;  });
-</script>
+    $uri = "https://dev.azure.com/$orgName/$projectName/_apis/build/builds?definitionId=1593&api-version=7.0"
 
+    $body = @{
+        definition = @{
+            id = "1593"
+        }
+    }
+
+    $headers = @{
+        Authorization = "Basic $([System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes(":$($personalAccessToken)")))"
+        'Content-Type' = 'application/json'
+    }
+    $response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body ($body | ConvertTo-Json -Depth 10)
+    $response
