@@ -1,21 +1,21 @@
-# Get the paths that have changed
-$changedPaths = git diff --name-only HEAD HEAD~1 | Where-Object { $_ -like 'overlays/dev/*' -or $_ -like 'overlays/sit/*' }
+$organization = "<your-organization-name>"
+$project = "<your-project-name>"
+$repositoryId = "<your-repository-id>"
+$commitId = "HEAD"
 
-# Extract the environment from the changed paths
-$environments = $changedPaths | ForEach-Object { (Split-Path $_ -Parent).Split("\")[-1] }
+$url = "https://dev.azure.com/$organization/$project/_apis/git/repositories/$repositoryId/commits/$commitId/changes?api-version=7.0"
 
-# Extract the environment name from the path
-$envNames = $environments | ForEach-Object { $_.Split("\")[-1] }
+$headers = @{
+    Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN"
+}
 
-# Print the changed paths and their environments
-if ($envNames) {
-  Write-Host "Changed paths in include section:"
-  foreach ($env in $envNames) {
-    Write-Host $env
-  }
+$response = Invoke-RestMethod -Uri $url -Headers $headers -Method Get
 
-  # Push the environment variable value to a variable group using Azure CLI
-  az pipelines variable-group variable create --group-id <variable-group-id> --name ENVIRONMENT_NAME --value $envNames
-} else {
-  Write-Host "No changed paths in include section."
+foreach ($change in $response.changes) {
+    $path = $change.item.path
+
+    if ($path -like "overlays/dev/*" -or $path -like "overlays/sit/*") {
+        $env = $path.Split("/")[1]
+        Write-Output $env
+    }
 }
