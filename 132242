@@ -1,0 +1,34 @@
+JWS base image builds, add a /release-[imagetag]-version.txt that includes version number/build information
+
+Description:
+Update - https://dev.azure.com/CTS-Edison/CorporateTrust/_git/docker-redhat-jws?path=/Dockerfile 
+Have it create a /release-[imagetag]-version.txt that allows some type of content that is stored that contains information about base image and build timestamp/version/or some other identifying information.   This information should be on one line and include the name of the image tag as well.
+
+example:
+/release-ocp-jws57-rhel8-jdk11-version.txt 
+
+Content would be something like
+ocp-jws57-rhel8-jdk11 = 2023-04-14-13:52:14
+
+This would allow users/support/etc to go to the terminal window in openshift can do a cat /*version.txt to see what build of the base image this was.
+
+
+Dockerfile:
+
+ARG baseImage
+FROM ${baseImage}
+
+ARG jdkHome
+COPY ./contrib/cacerts /usr/lib/jvm/java-11-openjdk/lib/security/
+RUN ls -l /usr/lib/jvm/java-11-openjdk/lib/security/
+
+
+yml file:
+
+    - template: templates/build-docker.yml
+      parameters:
+        imageRepository: 'ocp-jws57-rhel8-jdk11'
+        dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+        baseImage: registry.redhat.io/jboss-webserver-5/jws57-openjdk11-openshift-rhel8:5.7.1
+        jdkHome: '/usr/lib/jvm/java-11-openjdk'
+        enabled: true
