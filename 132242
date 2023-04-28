@@ -32,3 +32,17 @@ yml file:
         baseImage: registry.redhat.io/jboss-webserver-5/jws57-openjdk11-openshift-rhel8:5.7.1
         jdkHome: '/usr/lib/jvm/java-11-openjdk'
         enabled: true
+        
+ code:
+ 
+ 
+ ARG baseImage
+FROM ${baseImage}
+
+ARG jdkHome
+COPY ./contrib/cacerts /usr/lib/jvm/java-11-openjdk/lib/security/
+RUN ls -l /usr/lib/jvm/java-11-openjdk/lib/security/
+
+ARG imageRepository
+RUN echo "$(echo $imageRepository | cut -d'/' -f2) = $(date +%Y-%m-%d-%H:%M:%S)" > /release-$imageRepository-version.txt
+
