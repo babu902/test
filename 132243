@@ -1,0 +1,14 @@
+Provide variables, instructions/how to and monitor change of all jws based docker imaged to have a /release-[component]-version.txt that includes version/build information
+
+
+Add support for changing docker files of components to have docker image have information about component builds.
+Track all usages in GIT of the docker files and work with app teams to change their configs to have this information in a file called /release-[component]-version.txt
+ 
+example:
+/release-crru-ui-version.txt 
+
+Content would be something that includes the module version (similar to what is module.version) as we
+crru-ui version= crru-ui:2.8.62011
+crru-ui builddate = [build date]
+
+This would allow users/support/etc to go to the terminal window in openshift can do a cat /*version.txt to see what build of the base image this was(from a different story) as well as see what the component version number is.
