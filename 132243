@@ -33,3 +33,27 @@ EXPOSE 8443
 USER 1001
 
 CMD ["/opt/jws-5.7/tomcat/bin/launch.sh"]
+
+FROM nacctregistry.azurecr.io/ocp-jws57-rhel8-jdk11:62963
+
+ARG COMPONENT_NAME
+ARG COMPONENT_VERSION
+ARG BUILD_DATE
+
+# Create version file
+RUN echo "$COMPONENT_NAME version= $COMPONENT_NAME:$COMPONENT_VERSION" > /release-${COMPONENT_NAME}-version.txt && \
+    echo "$COMPONENT_NAME builddate = $BUILD_DATE" >> /release-${COMPONENT_NAME}-version.txt
+
+# Copy in context.xml that has datasource definition
+COPY contrib/context.xml /opt/jws-5.7/tomcat/conf/
+
+# Copy war file to ROOT.war so no context and can only go to url ending in hostname/
+COPY target/*.war /opt/jws-5.7/tomcat/webapps/ROOT.war
+
+EXPOSE 8080
+EXPOSE 8443
+
+USER 1001
+
+CMD ["/opt/jws-5.7/tomcat/bin/launch.sh"]
+
