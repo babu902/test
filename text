@@ -1,6 +1,1 @@
-- task: CmdLine@2
-  inputs:
-    script: |
-      set MAVEN_HOME=C:\Program Files\Apache\maven
-      %MAVEN_HOME%\bin\mvn -version
-    workingDirectory: 'path/to/project'
+jboss-webserver-5/jws57-openjdk11-openshift-rhel8
