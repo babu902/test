@@ -57,3 +57,10 @@ USER 1001
 
 CMD ["/opt/jws-5.7/tomcat/bin/launch.sh"]
 
+$buildDate = Get-Date -Format "yyyy-MM-dd"
+
+# Create the version file
+$versionContent = "$componentName version= $componentName:$componentVersion`n$componentName builddate = $buildDate"
+$versionFilePath = "/release-$componentName-version.txt"
+$versionContent | Set-Content -Path $versionFilePath
+
