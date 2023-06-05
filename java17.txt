@@ -1,0 +1,3 @@
+https://examples.javacodegeeks.com/java-development/enterprise-java/maven/create-web-application-project-with-maven-example/
+
+https://github.com/up1/maven_java_web_example
