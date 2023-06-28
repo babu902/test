@@ -1,0 +1,109 @@
+Sumologic/Logs
+
+Sumologic is plugged into all environments.  No action required by teams using openshift.  As soon as a pod is on openshift the logs are being captured.
+
+URL
+
+Sumo Logic URL: - North America
+
+https://service.us2.sumologic.com/
+
+Simple query to look at logs:
+
+_sourceCategory=kubernetes/CCT/OpenShift/DEV/01/WATA 
+deployment = "yourmodulenamehere-deployment-dev"
+
+
+
+
+Source Categories
+
+Adding a _sourceCategory is best practice.
+
+_sourceCategory=kubernetes/CCT/OpenShift/DEV/01/WATA
+
+_sourceCategory=kubernetes/CCT/OpenShift/SIT/01/WATA
+
+_sourceCategory=kubernetes/CCT/OpenShift/UAT/01/QASP
+
+_sourceCategory=kubernetes/CCT/OpenShift/UAT/01/QASF
+
+_sourceCategory=kubernetes/CCT/OpenShift/PROD/01/QASP
+
+_sourceCategory=kubernetes/CCT/OpenShift/PROD/01/QASF
+
+How to request access to Sumologic
+
+Put in Service Now Ticket
+
+Search for Sumo
+
+Click on the Sumo Logic Access Request
+
+Put in access required as
+
+North America Instance
+
+First Name
+
+Last Name
+
+Computershare email address
+
+Ask for access to the “CCT App Support” Role.
+
+Confirm your module logs are being picked up
+
+Put in query for your deployment name.  Example -”crru-service-deployment-dev”   will find logs for the crru-service in the dev environment.   “crru-service-deployment-sit” will find logs for sit deployment, etc.
+
+Other query examples
+
+Find logs for a module:
+
+Examples:
+
+deployment = "ctsg-deployment-dev"
+
+deployment = "parties-deployment-dev"
+
+deployment = "dealseries-deployment-dev"
+
+Find Things going across a cluster
+
+Find OS, Jboss Web Server, JDK, tomcat versions
+
+cluster = "qasp-prod-cct-01" ("Server version name" or "OS Version" or "JVM Version" or "jws56-openjdk11-rhel8-openshift")
+
+Find oracle errors in the prod clusters
+
+(ORA-)
+| where cluster in ("qasp-prod-cct-01", "qasf-prod-cct-01", "wata-prod-cct-01")
+
+Find users that log in and their roles
+
+// query to find user login events and provide upn and security role in parsed fields.
+// select Time, Container, upn, roles
+("Setting security context")
+| where cluster in ("qasp-prod-cct-01", "qasf-prod-cct-01", "wata-prod-cct-01")
+| parse "Authorities=[]" as roles
+| parse "security.CTSUser()" as upn
+
+ 
+
+Find number of logins per module grouped by date
+
+("Setting security context")
+| where cluster in ("qasp-prod-cct-01", "qasf-prod-cct-01", "wata-prod-cct-01")
+| formatDate(_messageTime, "MM/dd/yyyy") as day
+| count by container, day
+| sort by day, _count
+
+ 
+
+Logs by day/hour/minute
+
+(javax.naming.NameNotFoundException)
+| where cluster in ("qasp-prod-cct-01", "qasf-prod-cct-01", "wata-prod-cct-01")
+| formatDate(_messageTime, "MM/dd/yyyy HH:mm") as day_hm
+| count by container, day_hm
+| sort by day_hm, _count
