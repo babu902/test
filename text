@@ -1,2 +1,2 @@
-jboss-webserver-5/jws57-openjdk11-openshift-rhel8
-https://catalog.redhat.com/software/containers/jboss-webserver-5/jws57-openjdk17-openshift-rhel8/6241a7c7456d2e626dd773bd
+Introduction:
+Application logs play a crucial role in troubleshooting, monitoring, and improving the performance of your applications. They provide valuable insights into the inner workings of your software, enabling you to identify issues, track user behavior, and make informed decisions. Sumo Logic is a powerful cloud-native machine data analytics platform that can help you centralize, analyze, and extract meaningful information from your application logs. In this blog post, we will guide you through the process of getting application logs using Sumo Logic.
