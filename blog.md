@@ -31,85 +31,23 @@ Sumo Logic URL:
 To access Sumo Logic, navigate to the following URL for the North America instance:
 
 URL: https://service.us2.sumologic.com/
-Query to Retrieve Logs for a Specific Deployment:
-To view logs for a specific deployment, use the following query:
+- Search for logs with a specific error message:
+("Error message here")
+| where cluster in ("qasp-prod-cct-01", "qasf-prod-cct-01", "wata-prod-cct-01")
+
+- Filter logs based on a specific time range:
 _sourceCategory=kubernetes/CCT/OpenShift/DEV/01/WATA
-deployment="yourmodulenamehere-deployment-dev"
+deployment = "yourmodulenamehere-deployment-dev"
+| where _messageTime > now() - 1d and _messageTime < now()
 
-Replace "yourmodulenamehere" with the actual name of your deployment.
-
-Source Categories:
-Source categories are an important best practice for organizing and categorizing logs in Sumo Logic. Here are some commonly used source categories:
-
-Development Environment:
-```
-_sourceCategory=kubernetes/CCT/OpenShift/DEV/01/WATA
-System Integration Testing (SIT) Environment:
-_sourceCategory=kubernetes/CCT/OpenShift/SIT/01/WATA
-User Acceptance Testing (UAT) Environment (QASP):
-_sourceCategory=kubernetes/CCT/OpenShift/UAT/01/QASP
-User Acceptance Testing (UAT) Environment (QASF):
-_sourceCategory=kubernetes/CCT/OpenShift/UAT/01/QASF
-Production Environment (QASP):
+- Filter logs by log level (e.g., INFO, WARN, ERROR):
 _sourceCategory=kubernetes/CCT/OpenShift/PROD/01/QASP
-Production Environment (QASF):
-_sourceCategory=kubernetes/CCT/OpenShift/PROD/01/QASF
-```
+| where deployment = "yourmodulenamehere-deployment-dev"
+| where _level="ERROR"
 
-Confirming Log Availability:
-To confirm that your module logs are being captured, use a query specific to your deployment name. For example:
-```
-deployment="crru-service-deployment-dev"
-```
-Replace "crru-service-deployment-dev" with the actual name of your deployment.
+- 
 
-Additional Query Examples:
 
-Finding Logs for a Module:
 
-Examples:
-deployment="ctsg-deployment-dev"
-deployment="parties-deployment-dev"
-deployment="dealseries-deployment-dev"
-Finding Things across a Cluster:
-
-Find OS, JBoss Web Server, JDK, and Tomcat versions:
-```
-cluster="qasp-prod-cct-01" ("Server version name" or "OS Version" or "JVM Version" or "jws56-openjdk11-rhel8-openshift")
-```
-
-Finding Oracle Errors in Production Clusters:
-```
-(ORA-)
-| where cluster in ("qasp-prod-cct-01", "qasf-prod-cct-01", "wata-prod-cct-01")
-```
-
-Finding Users and Their Roles:
-
-Query to find user login events and extract the UPN (User Principal Name) and security role in parsed fields:
-```
-("Setting security context")
-| where cluster in ("qasp-prod-cct-01", "qasf-prod-cct-01", "wata-prod-cct-01")
-| parse "Authorities=[]" as roles
-| parse "security.CTSUser()" as upn
-```
-
-Counting Logins per Module Grouped by Date:
-```
-("Setting security context")
-| where cluster in ("qasp-prod-cct-01", "qasf-prod-cct-01", "wata-prod-cct-01")
-| formatDate(_messageTime, "MM/dd/yyyy") as day
-| count by container, day
-| sort by day, _count
-```
-
-Analyzing Logs by Day, Hour, and Minute:
-```
-(javax.naming.NameNotFoundException)
-| where cluster in ("qasp-prod-cct-01", "qasf-prod-cct-01", "wata-prod-cct-01")
-| formatDate(_messageTime, "MM/dd/yyyy HH:mm") as day_hm
-| count by container, day_hm
-| sort by day_hm, _count
-```
 Conclusion:
 With Sumo Logic, you have a powerful tool at your disposal to efficiently search and analyze application logs. By using the provided commands and examples, you can gain valuable insights into your application's behavior, troubleshoot issues, and ensure optimal performance. Explore the full potential of Sumo Logic and make log analysis an integral part of your software development and operations workflows.
