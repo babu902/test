@@ -1,0 +1,1 @@
+{"timestamp":1688349883549,"log":"2023-07-03T02:04:43.549773496+00:00 stdout F 2023-07-02T22:04:43,549,App=CTSGWebui,Level=ERROR,UserThread=UNKNOWN:Thread-47,Message=processErrorModel - javax.servlet.jsp.jspException=null ,Class=c.w.c.c.w.v.CTSGJstlErrorView,line=91,Method=processErrorModel","stream":null,"time":null}
