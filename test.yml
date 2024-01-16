@@ -1,1 +1,40 @@
-manoj
+---
+- name: Install Apache Maven
+  hosts: your_target_servers
+  become: yes  # To execute tasks with sudo or become
+
+  tasks:
+    - name: Install Java (Assuming Java is required for Maven)
+      ansible.builtin.yum:
+        name: java-1.8.0-openjdk
+        state: present
+      become: yes
+
+    - name: Download Apache Maven tarball
+      ansible.builtin.get_url:
+        url: "https://downloads.apache.org/maven/maven-3/{{ maven_version }}/binaries/apache-maven-{{ maven_version }}-bin.tar.gz"
+        dest: "/tmp/apache-maven-{{ maven_version }}-bin.tar.gz"
+
+    - name: Extract Apache Maven
+      ansible.builtin.unarchive:
+        src: "/tmp/apache-maven-{{ maven_version }}-bin.tar.gz"
+        dest: "/opt/"
+        remote_src: yes
+
+    - name: Create symbolic link to Maven
+      ansible.builtin.file:
+        src: "/opt/apache-maven-{{ maven_version }}"
+        dest: "/opt/maven"
+        state: link
+
+    - name: Add Maven environment variables to the shell profile
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+        line: |
+          export M2_HOME=/opt/maven
+          export MAVEN_HOME=/opt/maven
+          export PATH=${M2_HOME}/bin:${PATH}
+      become: yes
+
+  vars:
+    maven_version: "3.8.5"  # Specify the desired Maven version
